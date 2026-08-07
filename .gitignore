@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+
+# Production Build Output
+dist/
+
+# Environment Variables & Secrets (SANGAT PENTING!)
+.env
+.env.local
+.env.development
+.env.production
+
+# WhatsApp Session Auth Data (SANGAT PENTING! Berisi Kunci Login WhatsApp)
+sessions/
+baileys_auth_info/
+baileys_store/
+
+# Logs & Temporary Files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
+*.swo
+.gemini/
+
+# OS Generated Files
+.DS_Store
+Thumbs.db

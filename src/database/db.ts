@@ -1,0 +1,42 @@
+import pg from 'pg';
+import { config } from '../config/env.js';
+
+const { Pool } = pg;
+
+export const pool = new Pool({
+  connectionString: config.databaseUrl,
+});
+
+export async function initDatabase() {
+  try {
+    const client = await pool.connect();
+    try {
+      // Create message_logs table if not exists
+      await client.query(`
+        CREATE TABLE IF NOT EXISTS message_logs (
+          id SERIAL PRIMARY KEY,
+          sender VARCHAR(100) NOT NULL,
+          message TEXT NOT NULL,
+          response TEXT,
+          created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+        );
+      `);
+      console.log('✅ PostgreSQL database initialized (message_logs table ready).');
+    } finally {
+      client.release();
+    }
+  } catch (err) {
+    console.warn('⚠️ PostgreSQL connection failed. Chat logging to DB will be bypassed if Postgres is unreachable:', (err as Error).message);
+  }
+}
+
+export async function logChatMessage(sender: string, message: string, response: string) {
+  try {
+    await pool.query(
+      'INSERT INTO message_logs (sender, message, response) VALUES ($1, $2, $3)',
+      [sender, message, response]
+    );
+  } catch (err) {
+    console.error('Failed to log chat message to DB:', (err as Error).message);
+  }
+}

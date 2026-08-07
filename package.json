@@ -1,0 +1,32 @@
+{
+  "name": "mikami-wa-assistant",
+  "version": "1.0.0",
+  "description": "AI WhatsApp Assistant (Mikami) - RAG with Gemini, Fastify, Qdrant, & Baileys",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "index:knowledge": "tsx src/scripts/indexKnowledge.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.22.0",
+    "@qdrant/js-client-rest": "^1.13.0",
+    "@whiskeysockets/baileys": "^6.7.18",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "glob": "^11.0.1",
+    "pg": "^8.13.1",
+    "pino": "^9.6.0",
+    "pino-pretty": "^13.0.0",
+    "qrcode-terminal": "^0.12.0",
+    "wa-sticker-formatter": "^4.4.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/pg": "^8.11.11",
+    "@types/qrcode-terminal": "^0.12.2",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
