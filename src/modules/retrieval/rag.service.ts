@@ -62,7 +62,7 @@ function getStickerInstruction(): string {
   return '';
 }
 
-export async function processRAGQuery(userMessage: string): Promise<string> {
+export async function processRAGQuery(userMessage: string, senderNumber?: string): Promise<string> {
   let contextChunks: string[] = [];
 
   try {
@@ -102,7 +102,21 @@ export async function processRAGQuery(userMessage: string): Promise<string> {
     console.warn('⚠️ Vector search encounter error. Proceeding with general prompt:', (error as Error).message);
   }
 
-  // 4. Construct System Prompt from personalize file + sticker rules + Context Chunks
+  // 4. Retrieve user memory if database is reachable and sender is specified
+  let memoryInstruction = '';
+  if (senderNumber) {
+    try {
+      const { getUserMemories } = await import('../../database/db.js');
+      const memories = await getUserMemories(senderNumber);
+      if (memories.length > 0) {
+        memoryInstruction = `\n\n--- MEMORI TENTANG PENGGUNA INI (${senderNumber}) ---\nKamu mengingat informasi berikut tentang pengguna ini:\n${memories.map((m, i) => `- ${m}`).join('\n')}\nGunakan memori ini jika relevan untuk mempersonalisasi jawabanmu.`;
+      }
+    } catch (err) {
+      // Ignore memory read errors
+    }
+  }
+
+  // 5. Construct System Prompt from personalize file + sticker rules + Context Chunks + User Memories
   const baseInstruction = getSystemInstructionBase();
   const stickerInstruction = getStickerInstruction();
 
@@ -115,9 +129,13 @@ export async function processRAGQuery(userMessage: string): Promise<string> {
     fullSystemInstruction += `\n\n--- INSTRUKSI STIKER ---\n${stickerInstruction}`;
   }
 
+  if (memoryInstruction) {
+    fullSystemInstruction += memoryInstruction;
+  }
+
   fullSystemInstruction += `\n\n--- KONTEKS PENGETAHUAN ---\n${contextFormatted}\n---------------------------`;
 
-  // 5. Generate final AI chat response
+  // 6. Generate final AI chat response
   const aiAnswer = await generateChatResponse(fullSystemInstruction, userMessage);
   return aiAnswer;
 }

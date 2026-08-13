@@ -94,7 +94,7 @@ export async function connectWhatsApp() {
       console.log(`\n📩 Incoming message from ${senderNumber}: "${textContent}"`);
 
       // ── /sticker command: convert user-sent image → WhatsApp sticker ──
-      const isStickerCommand = /^\/sticker\b/i.test(textContent.trim());
+      const isStickerCommand = /^[\/@]sticker\b/i.test(textContent.trim());
       const imageToConvert = imgMsg ?? quotedImg;
 
       if (isStickerCommand && imageToConvert) {
@@ -149,7 +149,7 @@ export async function connectWhatsApp() {
       await waSocket?.sendPresenceUpdate('composing', remoteJid);
 
       // ── Slash command handler (priority over RAG) ──
-      const commandReply = await handleSlashCommand(textContent);
+      const commandReply = await handleSlashCommand(textContent, senderNumber);
       if (commandReply !== null) {
         await waSocket?.sendMessage(remoteJid, { text: commandReply });
         await waSocket?.sendPresenceUpdate('paused', remoteJid);
@@ -159,7 +159,7 @@ export async function connectWhatsApp() {
       }
 
       // Process via RAG Engine
-      const aiReply = await processRAGQuery(textContent);
+      const aiReply = await processRAGQuery(textContent, senderNumber);
 
       // Check for [STICKER: filename] tag in aiReply
       const stickerMatch = aiReply.match(/\[STICKER:\s*([^\]]+)\]/i);

@@ -1,0 +1,6 @@
+✅ messager
+✅ create sticker
+✅ integrating with google calendar
+✅ integrating with obsidian
+✅ build memory system (supabase)
+✅ integrating with google analytics

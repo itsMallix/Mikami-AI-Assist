@@ -71,7 +71,7 @@ function r(template: string, vars: Record<string, string> = {}): string {
  * Detects if the message is a slash/at command and handles it.
  * Returns a response string if handled, or null if it's not a command.
  */
-export async function handleSlashCommand(text: string): Promise<string | null> {
+export async function handleSlashCommand(text: string, sender: string): Promise<string | null> {
   const trimmed = text.trim();
   if (!trimmed.startsWith('/') && !trimmed.startsWith('@')) return null;
 
@@ -94,8 +94,10 @@ export async function handleSlashCommand(text: string): Promise<string | null> {
   if (ref.ns === 'calendar') {
 
     if (ref.key === 'auth') {
-      if (isAuthenticated()) return cmd.reply_already_connected ?? null;
       const url = getAuthUrl();
+      if (isAuthenticated()) {
+        return `ℹ️ *Akun Google sudah terhubung.* Jika kamu ingin memperbarui izin/scope, silakan klik link ini:\n\n${url}`;
+      }
       return r(cmd.reply_connect_prompt ?? '', { url });
     }
 
@@ -159,6 +161,75 @@ export async function handleSlashCommand(text: string): Promise<string | null> {
       if (!args) return cmd.reply_no_args ?? null;
       try {
         return await getMeetingNote(args);
+      } catch (err) {
+        return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
+      }
+    }
+  }
+
+  // ── MEMORY NAMESPACE ───────────────────────────────────────
+  if (ref.ns === 'memory') {
+    if (ref.key === 'save') {
+      if (!args) return cmd.reply_no_args ?? null;
+      try {
+        const { saveUserMemory } = await import('../../database/db.js');
+        await saveUserMemory(sender, args);
+        return r(cmd.reply_success ?? '', { fact: args });
+      } catch (err) {
+        return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
+      }
+    }
+
+    if (ref.key === 'clear') {
+      try {
+        const { pool } = await import('../../database/db.js');
+        await pool.query('DELETE FROM user_memories WHERE sender = $1', [sender]);
+        return cmd.reply_success ?? null;
+      } catch (err) {
+        return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
+      }
+    }
+  }
+
+  // ── ANALYTICS NAMESPACE ────────────────────────────────────
+  if (ref.ns === 'analytics') {
+    if (!isAuthenticated()) {
+      return cmd.reply_not_connected ?? null;
+    }
+
+    const propParam = args || undefined;
+
+    if (ref.key === 'report') {
+      try {
+        const { getGA4TrafficReport } = await import('../analytics/analytics.service.js');
+        return await getGA4TrafficReport(propParam);
+      } catch (err) {
+        return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
+      }
+    }
+
+    if (ref.key === 'realtime') {
+      try {
+        const { getGA4RealtimeReport } = await import('../analytics/analytics.service.js');
+        return await getGA4RealtimeReport(propParam);
+      } catch (err) {
+        return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
+      }
+    }
+
+    if (ref.key === 'pages') {
+      try {
+        const { getGA4TopPagesReport } = await import('../analytics/analytics.service.js');
+        return await getGA4TopPagesReport(propParam);
+      } catch (err) {
+        return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
+      }
+    }
+
+    if (ref.key === 'source') {
+      try {
+        const { getGA4TrafficSourcesReport } = await import('../analytics/analytics.service.js');
+        return await getGA4TrafficSourcesReport(propParam);
       } catch (err) {
         return r(cmd.reply_error ?? '❌ {{error}}', { error: (err as Error).message });
       }

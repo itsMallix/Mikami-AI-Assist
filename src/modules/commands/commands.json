@@ -86,6 +86,67 @@
           "reply_error": "❌ {{error}}"
         }
       }
+    },
+    "memory": {
+      "prefix": "@memory",
+      "description": "Kelola memori asisten tentang kamu",
+      "commands": {
+        "save": {
+          "trigger": "@memory",
+          "description": "Simpan memori tentang kamu",
+          "reply_no_args": "🧠 Format: @memory <fakta tentang kamu>\nContoh: @memory minuman kesukaanku adalah milkshake",
+          "reply_success": "🧠 Siap king! Aku bakal ingat terus kalau: \"{{fact}}\" 😸",
+          "reply_error": "❌ Gagal menyimpan memori: {{error}}"
+        },
+        "clear": {
+          "trigger": "@memory-clear",
+          "description": "Hapus semua memori tentang kamu",
+          "reply_success": "🧠 Bye! Semua memori tentang kamu udah ku hapus ygy 🗿",
+          "reply_error": "❌ Gagal menghapus memori: {{error}}"
+        }
+      }
+    },
+    "analytics": {
+      "prefix": "@analytics",
+      "description": "Google Analytics 4 — pantau traffic website",
+      "commands": {
+        "report": {
+          "trigger": "@analytics",
+          "aliases": [
+            "@analytics-traffic",
+            "@ga4"
+          ],
+          "description": "Tampilkan laporan traffic GA4 7 hari terakhir",
+          "reply_not_connected": "⚠️ Akun Google belum terhubung atau perlu re-auth scope Analytics.\nKetik @calendar-auth untuk menghubungkan ulang.",
+          "reply_error": "❌ {{error}}"
+        },
+        "realtime": {
+          "trigger": "@analytics-realtime",
+          "description": "Tampilkan jumlah pengunjung aktif GA4 saat ini",
+          "reply_not_connected": "⚠️ Akun Google belum terhubung atau perlu re-auth scope Analytics.\nKetik @calendar-auth untuk menghubungkan ulang.",
+          "reply_error": "❌ {{error}}"
+        },
+        "pages": {
+          "trigger": "@analytics-pages",
+          "aliases": [
+            "@ga4-pages",
+            "@top-pages"
+          ],
+          "description": "Tampilkan top 10 halaman populer GA4 7 hari terakhir",
+          "reply_not_connected": "⚠️ Akun Google belum terhubung atau perlu re-auth scope Analytics.\nKetik @calendar-auth untuk menghubungkan ulang.",
+          "reply_error": "❌ {{error}}"
+        },
+        "source": {
+          "trigger": "@analytics-source",
+          "aliases": [
+            "@ga4-source",
+            "@traffic-source"
+          ],
+          "description": "Tampilkan sumber traffic utama GA4 7 hari terakhir",
+          "reply_not_connected": "⚠️ Akun Google belum terhubung atau perlu re-auth scope Analytics.\nKetik @calendar-auth untuk menghubungkan ulang.",
+          "reply_error": "❌ {{error}}"
+        }
+      }
     }
   },
   "global": {
@@ -96,7 +157,7 @@
         "/bantuan"
       ],
       "description": "Tampilkan semua perintah yang tersedia",
-      "reply": "🤖 *Mikami List Command*\n\n📅 *Google Calendar* [ `@calendar` ] :\n• `@calendar-auth` — Connect G-Calendar\n• `@calendar-today` — Lihat jadwal hari ini\n• `@calendar-week` — Lihat jadwal minggu ini\n• `@calendar-create <judul> | 2024-08-15T14:00 | 2024-08-15T15:00` — Buat event baru\n\n📓 *Obsidian* [ `@obsidian` ] :\n• `@obsidian-search <kata kunci>` — Cari catatan meeting\n• `@obsidian-read <judul>` — Baca isi catatan meeting\n\n🖼️ *Stiker* [ `@sticker` ] :\n• `@sticker` — Kirim gambar + command untuk bikin stiker\n\n❓ *Bantuan* [ `@help` ] :\n• `@help` — Tampilkan semua command"
+      "reply": "🤖 *Mikami List Command*\n\n📅 *Google Calendar* [ `@calendar` ] :\n• `@calendar-auth` — Connect Calendar\n• `@calendar-today` — Lihat jadwal hari ini\n• `@calendar-week` — Lihat jadwal minggu ini\n• `@calendar-create <judul> | 2024-08-15T14:00 | 2024-08-15T15:00` — Buat event baru\n\n📈 *Google Analytics* [ `@analytics` ] :\n• `@analytics [alias/ID]` — Report traffic web (7 hari terakhir)\n• `@analytics-realtime [alias/ID]` — Report real-time active users\n• `@analytics-pages [alias/ID]` — Top 10 page\n• `@analytics-source [alias/ID]` — Sumber traffic utama\n\n📓 *Obsidian* [ `@obsidian` ] :\n• `@obsidian-search <kata kunci>` — Cari note\n• `@obsidian-read <judul>` — Baca isi note\n\n🖼️ *Stiker* [ `@sticker` ] :\n• `@sticker` — Kirim gambar untuk bikin stiker\n\n🧠 *Memori* [ `@memory` ] :\n• `@memory <pesan>` — Simpan memori mu\n• `@memory-clear` — Hapus semua memori mu\n\n❓ *Bantuan* [ `@help` ] :\n• `@help` — Tampilkan semua command"
     }
   }
 }
