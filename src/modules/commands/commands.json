@@ -1,0 +1,102 @@
+{
+  "_info": "Edit file ini untuk mengubah command Mikami. Tidak perlu ubah TypeScript.",
+  "_version": "2.0.0",
+  "namespaces": {
+    "calendar": {
+      "prefix": "@calendar",
+      "description": "Google Calendar — kelola jadwal & event",
+      "commands": {
+        "auth": {
+          "trigger": "@calendar-auth",
+          "aliases": [
+            "@auth-google"
+          ],
+          "description": "Hubungkan akun Google Calendar",
+          "reply_already_connected": "✅ Google Calandar Connected",
+          "reply_connect_prompt": "🔐 *Login Google Calendar*\n\nBuka link ini di browser untuk login:\n{{url}}\n\nSetelah login, salin kode yang muncul lalu kirim:\n@calendar-code <kode kamu>"
+        },
+        "code": {
+          "trigger": "@calendar-code",
+          "aliases": [
+            "@google-code"
+          ],
+          "description": "Input kode OAuth Google setelah login",
+          "reply_no_args": "⚠️ Format: @calendar-code <kode>\nContoh: @calendar-code 4/0AX...",
+          "reply_success": "✅ *Google Calendar berhasil terhubung!*\n\nSekarang kamu bisa:\n• @calendar — lihat jadwal hari ini\n• @calendar-week — lihat jadwal minggu ini\n• @calendar-create — buat event baru",
+          "reply_error": "❌ Gagal verifikasi kode Google: {{error}}"
+        },
+        "today": {
+          "trigger": "@calendar",
+          "aliases": [
+            "@calendar-today"
+          ],
+          "description": "Lihat jadwal hari ini",
+          "reply_not_connected": "⚠️ Google Calendar belum terhubung.\nKetik @calendar-auth untuk mulai.",
+          "reply_error": "❌ {{error}}"
+        },
+        "week": {
+          "trigger": "@calendar-week",
+          "description": "Lihat jadwal minggu ini",
+          "reply_not_connected": "⚠️ Google Calendar belum terhubung.\nKetik @calendar-auth untuk mulai.",
+          "reply_error": "❌ {{error}}"
+        },
+        "create": {
+          "trigger": "@calendar-create",
+          "description": "Buat event baru di kalender",
+          "reply_no_args": "📅 *Buat Event Baru*\n\nFormat:\n@calendar-create Judul | tanggal-mulai | tanggal-selesai\n\nContoh:\n@calendar-create Meeting Klien | 2024-08-15T14:00 | 2024-08-15T15:00",
+          "reply_not_connected": "⚠️ Google Calendar belum terhubung.\nKetik @calendar-auth untuk mulai.",
+          "reply_format_error": "⚠️ Format kurang lengkap.\n\nGunakan:\n@calendar-create Judul Event | 2024-08-15T14:00 | 2024-08-15T15:00",
+          "reply_error": "❌ Gagal membuat event: {{error}}"
+        }
+      }
+    },
+    "obsidian": {
+      "prefix": "@obsidian",
+      "description": "Obsidian — catatan meeting",
+      "commands": {
+        "search": {
+          "trigger": "@obsidian-search",
+          "aliases": [
+            "@obsidian"
+          ],
+          "description": "Cari catatan meeting berdasarkan kata kunci",
+          "reply_no_args": "📓 *Cari Catatan Meeting*\n\nFormat:\n@obsidian-search <kata kunci>\n\nContoh:\n@obsidian-search marketing",
+          "reply_error": "❌ {{error}}"
+        },
+        "read": {
+          "trigger": "@obsidian-read",
+          "description": "Baca isi catatan meeting",
+          "reply_no_args": "📄 *Baca Catatan Meeting*\n\nFormat:\n@obsidian-read <judul>",
+          "reply_error": "❌ {{error}}"
+        }
+      }
+    },
+    "sticker": {
+      "prefix": "@sticker",
+      "description": "WhatsApp Sticker — konversi gambar jadi stiker",
+      "commands": {
+        "create": {
+          "trigger": "@sticker",
+          "aliases": [
+            "@sticker"
+          ],
+          "description": "Konversi gambar yang dikirim menjadi stiker WhatsApp",
+          "reply_no_image": "Kirim atau reply gambar yang mau dijadiin stike! biar ku proses 🗿",
+          "reply_processing": "Siap king! Gambarnya lagi aku proses, wait",
+          "reply_error": "❌ {{error}}"
+        }
+      }
+    }
+  },
+  "global": {
+    "help": {
+      "trigger": "@help",
+      "aliases": [
+        "/help",
+        "/bantuan"
+      ],
+      "description": "Tampilkan semua perintah yang tersedia",
+      "reply": "🤖 *Mikami List Command*\n\n📅 *Google Calendar* [ `@calendar` ] :\n• `@calendar-auth` — Connect G-Calendar\n• `@calendar-today` — Lihat jadwal hari ini\n• `@calendar-week` — Lihat jadwal minggu ini\n• `@calendar-create <judul> | 2024-08-15T14:00 | 2024-08-15T15:00` — Buat event baru\n\n📓 *Obsidian* [ `@obsidian` ] :\n• `@obsidian-search <kata kunci>` — Cari catatan meeting\n• `@obsidian-read <judul>` — Baca isi catatan meeting\n\n🖼️ *Stiker* [ `@sticker` ] :\n• `@sticker` — Kirim gambar + command untuk bikin stiker\n\n❓ *Bantuan* [ `@help` ] :\n• `@help` — Tampilkan semua command"
+    }
+  }
+}

@@ -98,7 +98,7 @@ export async function connectWhatsApp() {
       const imageToConvert = imgMsg ?? quotedImg;
 
       if (isStickerCommand && imageToConvert) {
-        console.log(`🎨 /sticker command detected — downloading & converting image from ${senderNumber}...`);
+        console.log(`🎨 @sticker command detected — downloading & converting image from ${senderNumber}...`);
         await waSocket?.sendPresenceUpdate('composing', remoteJid);
 
         // Acknowledge receipt
@@ -113,9 +113,9 @@ export async function connectWhatsApp() {
             imgMsg
               ? msg
               : {
-                  ...msg,
-                  message: { imageMessage: quotedImg },
-                } as any,
+                ...msg,
+                message: { imageMessage: quotedImg },
+              } as any,
             'buffer',
             {},
           );
@@ -197,7 +197,7 @@ export async function connectWhatsApp() {
             try {
               const buffer = fs.readFileSync(assetPath);
               await waSocket?.sendMessage(remoteJid, { image: buffer });
-            } catch (imgErr) {}
+            } catch (imgErr) { }
           }
         } else {
           console.warn(`⚠️ Sticker file not found at path: ${assetPath}`);
