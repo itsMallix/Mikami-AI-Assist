@@ -47,6 +47,6 @@ export async function generateChatResponse(systemInstruction: string, userPrompt
     return responseText || 'Maaf, saya tidak dapat memproses jawaban saat ini.';
   } catch (error) {
     console.error('Error generating Gemini chat completion:', (error as Error).message);
-    return 'Bising bodo aku nak tido 😹🤫';
+    return 'Bising bodo aku nak tido 😹🥱';
   }
 }

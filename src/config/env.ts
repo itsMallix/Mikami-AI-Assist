@@ -12,6 +12,13 @@ export const config = {
   databaseUrl: process.env.DATABASE_URL || 'postgres://postgres:postgres@localhost:5432/mikami_db',
   waSessionDir: path.resolve(process.env.WA_SESSION_DIR || './sessions'),
   knowledgeDir: path.resolve('./knowledge'),
+  // Google Calendar OAuth2
+  googleClientId: process.env.GOOGLE_CLIENT_ID || '',
+  googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+  googleRedirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/auth/google/callback',
+  // Obsidian
+  obsidianVaultPath: process.env.OBSIDIAN_VAULT_PATH || '/myObsidianVaultFolder',
+  obsidianMeetingFolder: process.env.OBSIDIAN_MEETING_FOLDER || 'Meetings',
 };
 
 export function validateEnv() {

@@ -3,6 +3,7 @@ import makeWASocket, {
   DisconnectReason,
   fetchLatestBaileysVersion,
   WASocket,
+  downloadMediaMessage,
 } from '@whiskeysockets/baileys';
 import qrcode from 'qrcode-terminal';
 import pino from 'pino';
@@ -13,6 +14,7 @@ import { Sticker, StickerTypes } from 'wa-sticker-formatter';
 import { config } from '../../config/env.js';
 import { processRAGQuery } from '../retrieval/rag.service.js';
 import { logChatMessage } from '../../database/db.js';
+import { handleSlashCommand } from '../commands/command.handler.js';
 
 let waSocket: WASocket | null = null;
 
@@ -69,19 +71,92 @@ export async function connectWhatsApp() {
         return;
       }
 
-      // Extract text content
+      // Detect image message (sent directly or as quoted/replied image)
+      const imgMsg =
+        msg.message.imageMessage ??
+        msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ??
+        null;
+
+      // Extract text content (caption on image, or plain text)
       const textContent =
-        msg.message.conversation ||
-        msg.message.extendedTextMessage?.text ||
+        msg.message.imageMessage?.caption ??
+        msg.message.conversation ??
+        msg.message.extendedTextMessage?.text ??
         '';
 
-      if (!textContent.trim()) return;
+      // Also check if it's a reply to an image with /sticker text
+      const quotedImg =
+        msg.message.extendedTextMessage?.contextInfo?.quotedMessage?.imageMessage ?? null;
+
+      if (!textContent.trim() && !imgMsg) return;
 
       const senderNumber = remoteJid.replace('@s.whatsapp.net', '');
       console.log(`\n📩 Incoming message from ${senderNumber}: "${textContent}"`);
 
+      // ── /sticker command: convert user-sent image → WhatsApp sticker ──
+      const isStickerCommand = /^\/sticker\b/i.test(textContent.trim());
+      const imageToConvert = imgMsg ?? quotedImg;
+
+      if (isStickerCommand && imageToConvert) {
+        console.log(`🎨 /sticker command detected — downloading & converting image from ${senderNumber}...`);
+        await waSocket?.sendPresenceUpdate('composing', remoteJid);
+
+        // Acknowledge receipt
+        await waSocket?.sendMessage(remoteJid, {
+          text: 'Siap king! Gambarnya lagi aku olah nih, tunggu sebentar ya stikernya meluncur... 🚀',
+        });
+
+        try {
+          // Download the image from WhatsApp servers
+          const mediaBuffer = await downloadMediaMessage(
+            // When it's a quoted image we need to reconstruct a minimal msg object
+            imgMsg
+              ? msg
+              : {
+                  ...msg,
+                  message: { imageMessage: quotedImg },
+                } as any,
+            'buffer',
+            {},
+          );
+
+          const sticker = new Sticker(mediaBuffer as Buffer, {
+            pack: 'Mikami AI Bot',
+            author: 'Mikami',
+            type: StickerTypes.FULL,
+            quality: 70,
+          });
+
+          const stickerBuffer = await sticker.toBuffer();
+          await waSocket?.sendMessage(remoteJid, { sticker: stickerBuffer });
+          console.log(`✅ User sticker converted & sent successfully to ${senderNumber}!`);
+        } catch (err) {
+          console.error('❌ Failed to convert user image to sticker:', (err as Error).message);
+          await waSocket?.sendMessage(remoteJid, {
+            text: 'Waduh, gagal nih olah gambarnya 😓 Coba kirim ulang gambarnya ya king!',
+          });
+        }
+
+        await waSocket?.sendPresenceUpdate('paused', remoteJid);
+        logChatMessage(senderNumber, textContent, '[sticker sent]');
+        return;
+      }
+
+      // If no text to process further, skip
+      if (!textContent.trim()) return;
+
       // Show typing indicator status ("ketik...") in WhatsApp
       await waSocket?.sendPresenceUpdate('composing', remoteJid);
+
+      // ── Slash command handler (priority over RAG) ──
+      const commandReply = await handleSlashCommand(textContent);
+      if (commandReply !== null) {
+        await waSocket?.sendMessage(remoteJid, { text: commandReply });
+        await waSocket?.sendPresenceUpdate('paused', remoteJid);
+        console.log(`📤 Command reply sent to ${senderNumber}`);
+        logChatMessage(senderNumber, textContent, commandReply);
+        return;
+      }
 
       // Process via RAG Engine
       const aiReply = await processRAGQuery(textContent);
@@ -98,13 +173,13 @@ export async function connectWhatsApp() {
       await waSocket?.sendPresenceUpdate('paused', remoteJid);
       console.log(`📤 Reply sent to ${senderNumber}:\n"${cleanReplyText}"\n`);
 
-      // If sticker tag was present, convert image to native WhatsApp Sticker
+      // If sticker tag was present, convert preset image to native WhatsApp Sticker
       if (stickerFileName) {
         const assetsDir = path.resolve('./assets');
         const assetPath = path.join(assetsDir, stickerFileName);
 
         if (fs.existsSync(assetPath)) {
-          console.log(`🎨 Converting image "${stickerFileName}" to WhatsApp Sticker for ${senderNumber}...`);
+          console.log(`🎨 Converting preset image "${stickerFileName}" to WhatsApp Sticker for ${senderNumber}...`);
           try {
             const sticker = new Sticker(assetPath, {
               pack: 'Mikami AI Bot',
