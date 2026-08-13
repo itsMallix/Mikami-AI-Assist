@@ -4,3 +4,5 @@
 ✅ integrating with obsidian
 ✅ build memory system (supabase)
 ✅ integrating with google analytics
+integrating with google mail
+add feature report csv / xlsx for report google analytics
